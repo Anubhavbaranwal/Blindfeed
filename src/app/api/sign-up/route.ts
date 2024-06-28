@@ -49,13 +49,13 @@ export async function POST(request: Request) {
       const hashedPassword = await bcrypt.hash(password, 10);
       const expiryDate = new Date();
       expiryDate.setHours(expiryDate.getHours() + 1);
-
+      console.log("expiryDate", expiryDate);
       const newUser = new Usermodel({
-        username,
+        name:username,
         email,
         password: hashedPassword,
         verifyCode,
-        verifyCodeExpiry: expiryDate,
+        verificationCodeExpires: expiryDate,
         isVerified: false,
         isAcceptingMessages: true,
         messages: [],
@@ -75,6 +75,7 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+    console.log("email sent.",emailResponse);
 
     return Response.json(
       {
