@@ -11,11 +11,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { codevalidator } from "@/schemas/verifyschema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { Console } from "console";
 import { useParams, useRouter } from "next/navigation"
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 
 const page = () => {
     const router =useRouter();
