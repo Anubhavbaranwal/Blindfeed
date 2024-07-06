@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { X } from 'lucide-react';
-import { Message } from '@/model/User';
+import {Message} from '@/model/User.model';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -37,8 +37,7 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
       toast({
         title: response.data.message,
       });
-      onMessageDelete(message._id);
-
+      onMessageDelete(message._id as string);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       toast({

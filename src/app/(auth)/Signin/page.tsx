@@ -105,7 +105,7 @@ const SigninPage = () => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please Wait
                 </>
               ) : (
-                "Signup"
+                "Signin"
               )}
             </Button>
           </form>
@@ -113,7 +113,7 @@ const SigninPage = () => {
         <div className="text-center mt-4">
           <p>
             New to platform?{" "}
-            <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
+            <Link href="/Signup" className="text-blue-600 hover:text-blue-800">
               Sign up
             </Link>
           </p>

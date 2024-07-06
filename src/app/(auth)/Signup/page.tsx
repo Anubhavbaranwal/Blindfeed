@@ -68,9 +68,11 @@ const SignupPage = () => {
   }, [username]);
 
   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
+    console.log("submit")
     setIsSubmitting(true);
     try {
       const response = await axios.post<ApiResponse>("/api/sign-up", data);
+      console.log(response)
       if (response.data?.success) {
         toast({
           title: "Success",
@@ -163,7 +165,7 @@ const SignupPage = () => {
             <Button type="submit" disabled={isSubmitting} className="my-6">
               {isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please Wait
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> "Please Wait"
                 </>
               ) : (
                 "Signup"
@@ -174,7 +176,7 @@ const SignupPage = () => {
         <div className="text-center mt-4">
           <p>
             Already a member?{" "}
-            <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
+            <Link href="/Signin" className="text-blue-600 hover:text-blue-800">
               Sign in
             </Link>
           </p>
