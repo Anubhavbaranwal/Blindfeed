@@ -1,37 +1,37 @@
 "use client";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
-import { useDebounceCallback, useDebounceValue } from "usehooks-ts";
-import { useToast } from "@/components/ui/use-toast";
-import { signupSchema } from "@/schemas/signupschema";
-import { useRouter } from "next/navigation";
-import axios, { AxiosError } from "axios";
+
 import { ApiResponse } from "@/types/ApiResponse";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDebounceCallback } from "usehooks-ts";
+import * as z from "zod";
+
+import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import axios, { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signupSchema } from "@/schemas/signupschema";
 
-const SignupPage = () => {
+export default function SignUpForm() {
   const [username, setUsername] = useState("");
   const [usernameMessage, setUsernameMessage] = useState("");
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const debouncedUsername = useDebounceCallback(setUsername, 300);
 
-  const debounced = useDebounceCallback(setUsername, 300);
-  const { toast } = useToast();
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -67,26 +67,34 @@ const SignupPage = () => {
     checkUsername();
   }, [username]);
 
+
   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
-    console.log("submit")
+    console.log("submit");
     setIsSubmitting(true);
     try {
-      const response = await axios.post<ApiResponse>("/api/sign-up", data);
-      console.log(response)
-      if (response.data?.success) {
-        toast({
-          title: "Success",
-          description: response.data.message,
-        });
-        router.replace(`/verify/${data.name}`);
-      }
-    } catch (error: any) {
+      const response = await axios.post<ApiResponse>("/api/Signup", data);
       toast({
-        title: "Error",
-        description:
-          error.response?.data.message || "Error while registering the user",
+        title: "Success",
+        description: response.data.message,
       });
-    } finally {
+
+      router.replace(`/verify/${username}`);
+
+      setIsSubmitting(false);
+    } catch (error) {
+      console.error("Error during sign-up:", error);
+
+      const axiosError = error as AxiosError<ApiResponse>;
+      let errorMessage =
+        axiosError.response?.data.message ||
+        "There was a problem with your sign-up. Please try again.";
+
+      toast({
+        title: "Sign Up Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+
       setIsSubmitting(false);
     }
   };
@@ -96,31 +104,27 @@ const SignupPage = () => {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Join Mystery Messaging
+            Join True Feedback
           </h1>
           <p className="mb-4">Sign up to start your anonymous adventure</p>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
-              control={form.control}
               name="name"
+              control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Username"
-                      {...field}
-                      onChange={(e: any) => {
-                        field.onChange(e);
-                        debounced(e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription>
+                  <Input
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      debouncedUsername(e.target.value);
+                    }}
+                  />
                   {isCheckingUsername && <Loader2 className="animate-spin" />}
-                  {!isCheckingUsername && username && (
+                  {!isCheckingUsername && usernameMessage && (
                     <p
                       className={`text-sm ${
                         usernameMessage === "Username is unique"
@@ -131,44 +135,44 @@ const SignupPage = () => {
                       {usernameMessage}
                     </p>
                   )}
-                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
-              control={form.control}
               name="email"
+              control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Email" {...field} />
-                  </FormControl>
+                  <Input {...field} name="email" />
+                  <p className="text-muted text-gray-600 text-sm">
+                    We will send you a verification code
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
-              control={form.control}
               name="password"
+              control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Password" {...field} />
-                  </FormControl>
+                  <Input type="password" {...field} name="password" />
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isSubmitting} className="my-6">
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> "Please Wait"
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait
                 </>
               ) : (
-                "Signup"
+                "Sign Up"
               )}
             </Button>
           </form>
@@ -184,6 +188,4 @@ const SignupPage = () => {
       </div>
     </div>
   );
-};
-
-export default SignupPage;
+}
