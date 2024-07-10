@@ -24,15 +24,18 @@ const page = () => {
     })
 
     const onSubmit=async(data:z.infer<typeof codevalidator>)=>{
+      console.log(params.username,data.code)
         try {
             const response= await axios.post('/api/verify',{
                 username:params.username,
-                code:data.code
+                otp:data.code
             })
+            console.log(response)
             toast({
                 title:"Success",
                 description:response.data.message
             })
+            router.replace("/Signin");
             
         } catch (error:any) {
             console.error(error);

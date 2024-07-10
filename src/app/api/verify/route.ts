@@ -9,6 +9,7 @@ export async function POST(request: Request) {
   try {
     const { username, otp } = await request.json();
     //zod validate
+    console.log(username, otp);
     const validatedotp = codevalidator.safeParse({ code: otp });
     if (!validatedotp.success) {
       return Response.json(
