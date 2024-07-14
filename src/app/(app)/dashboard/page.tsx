@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form";
 
 
-const page = () => {
+const Page = () => {
     const [message,setMessage]=useState<Message[]>([]);
     const [isLoading,setIsLoading]=useState(false);
     const [isSwitchingLoading,setIsSwitching]=useState(false);
@@ -189,4 +189,4 @@ const page = () => {
   )
 }
 
-export default page;
+export default Page;
