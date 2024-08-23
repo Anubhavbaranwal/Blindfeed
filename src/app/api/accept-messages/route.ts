@@ -57,7 +57,7 @@ export async function GET(request: Request) {
         { status: 401 }
       );
     }
-    const userid = user.id;
+    const userid = user._id;
     try {
         const finduser= await Usermodel.findById(userid);
         if(!finduser){

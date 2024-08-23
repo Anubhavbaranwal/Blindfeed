@@ -8,15 +8,18 @@ import mongoose from "mongoose";
 export async function GET(request: Request) {
     await connectdb();
     const session = await getServerSession(authOptions);
+    console.log("session",session);
     const user: User = session?.user as User;
+    console.log(user._id);
     if (!session || !user) {
       return Response.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
       );
     }
-    const userid = new mongoose.Types.ObjectId(user.id);
-
+    const userid = new mongoose.Types.ObjectId(user._id);
+    console.log("userid",userid);
+   
     try {
 
         const user =await Usermodel.aggregate([
@@ -26,10 +29,9 @@ export async function GET(request: Request) {
             {$group: {_id: "$_id", messages: {$push: "$messages"}}},
         ])
 
-
         if(!user || user.length === 0){
             return Response.json(
-                { success: false, message: "User not found" },
+                { success: false, message: "User not found or no message found" },
                 { status: 404 }
               );
         }

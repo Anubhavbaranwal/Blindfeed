@@ -5,6 +5,10 @@ import mongoose, { Schema,Document } from "mongoose";
     content: string;
     createdAt: Date;
  }
+ export interface SENDMessage extends Document {
+    message: string;
+    createdAt: Date;
+ }
 
  const MessageSchema = new Schema<Message>({
     content: { 
@@ -14,7 +18,8 @@ import mongoose, { Schema,Document } from "mongoose";
     createdAt: { 
         type: Date,
         default: Date.now,
-        required: true},
+        required: true
+    },
  });
 
   
