@@ -8,6 +8,7 @@ export async function POST(request: Request) {
   await connectdb();
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
+  console.log({ user });
   if (!session || !user) {
     return Response.json(
       { success: false, message: "Unauthorized" },
@@ -36,46 +37,45 @@ export async function POST(request: Request) {
       );
     }
     return Response.json(
-      { success: true, message: "message acceptance  updated successfully", updatedUser},
+      { success: true, message: "message acceptance updated successfully", updatedUser },
       { status: 200 }
     );
   } catch (error) {
     console.error("error while accepting messages");
     return Response.json(
-      { success: false, message: "error occured while accepting messages" },
+      { success: false, message: "error occurred while accepting messages" },
       { status: 500 }
     );
   }
 }
+
 export async function GET(request: Request) {
-    await connectdb();
-    const session = await getServerSession(authOptions);
-    const user: User = session?.user as User;
-    if (!session || !user) {
+  await connectdb();
+  const session = await getServerSession(authOptions);
+  const user: User = session?.user as User;
+  if (!session || !user) {
+    return Response.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+  const userid = user._id;
+  try {
+    const finduser = await Usermodel.findById(userid);
+    if (!finduser) {
       return Response.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
+        { success: false, message: "User not found" },
+        { status: 404 }
       );
     }
-    const userid = user._id;
-    try {
-        const finduser= await Usermodel.findById(userid);
-        if(!finduser){
-          return Response.json(
-            { success: false, message: "User not found" },
-            { status: 404 }
-          );
-        }
-        return Response.json(
-            { success: true, message: "User Accepting the message", Acceptingmessage: finduser.isAcceptingmessages },
-            { status: 200 }
-            );
-    
-    } catch (error) {
-        return Response.json(
-            { success: false, message: "error occured while getting user message acceptance" },
-            { status: 500 }
-        );
-    }
-
-}  
+    return Response.json(
+      { success: true, message: "User Accepting the message", isAcceptingmessage: finduser.isAcceptingmessages },
+      { status: 200 }
+    );
+  } catch (error) {
+    return Response.json(
+      { success: false, message: "error occurred while getting user message acceptance" },
+      { status: 500 }
+    );
+  }
+}

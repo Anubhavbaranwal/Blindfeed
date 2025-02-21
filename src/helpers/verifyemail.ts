@@ -1,21 +1,23 @@
-import { resend } from "@/lib/resend";
+import transporter from "@/lib/nodemailer";
 import VerificationEmail from "../../emailTemp/VerifyEmail";
 import { ApiResponse } from "@/types/ApiResponse";
+import { render } from "@react-email/components";
 
+export async function verifyEmail(email: string, username: string, otp: string): Promise<ApiResponse> {
+  try {
+    const emailHtml = render(VerificationEmail({ username, otp }));
 
-export async function verifyEmail(email: string,username:string,otp:string): Promise<ApiResponse> {
-    try{
-        const res=await resend.emails.send({
-            from: 'Acme <onboarding@resend.dev>',
-            to: email,
-            subject: 'Unknown Messenger | Verify your email address',
-            react: VerificationEmail({ username, otp }) ,
-          });
-            console.log(res);
-        return {success:true,message:"email sent for verification"};
-    }
-    catch(err){
-       console.log(err);
-       return {success:false,message:"error occured during email verification"};
-    }   
+    const info = await transporter.sendMail({
+      from: '"Your App Name" <no-reply@example.com>',
+      to: email,
+      subject: ' Verify your email address',
+      html: emailHtml,
+    });
+
+    console.log('Message sent: %s', info.messageId);
+    return { success: true, message: "Email sent for verification" };
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Error occurred during email verification" };
+  }
 }

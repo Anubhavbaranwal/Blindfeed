@@ -6,8 +6,6 @@ export async function POST(request: Request) {
     await connectdb();
 
     const {username,message:content}=await request.json();
-    const datad=await request.json();
-    console.log("content",datad);
     try {
         const user= await Usermodel.findOne({name:username});
         if(!user){
@@ -16,7 +14,7 @@ export async function POST(request: Request) {
                 { status: 404 }
               );
         }
-        if(!user.isAcceptingmessages){
+        if(!user?.isAcceptingmessages){
             return Response.json(
                 { success: false, message: "User is not accepting messages" },
                 { status: 400 }

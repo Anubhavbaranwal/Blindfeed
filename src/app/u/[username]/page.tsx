@@ -63,10 +63,13 @@ export default function SendMessage() {
   const onSubmit = async (data: z.infer<typeof messageschema>) => {
     setIsLoading(true);
     try {
+      console.log("data", data);
+      console.log("username", username);
       const response = await axios.post<ApiResponse>("/api/send-messages", {
         ...data,
         username,
       });
+      console.log("response", response);
 
       toast({
         title: response.data.message,
