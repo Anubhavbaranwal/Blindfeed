@@ -34,19 +34,29 @@ const parseStringMessages = (messageString: string): string[] => {
 const initialMessageString =
   "What's your favorite movie?||Do you have any pets?||What's your dream job?";
 
+  const fetchSuggestions = async (message: string): Promise<string[]> => {
+    const response = await axios.post("/api/suggest-messages", { message });
+    const res  =  response.data.questions.split(specialChar);
+    console.log("Response:", res);
+    return res;
+  };
+
 export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
-
-  const {
-    complete,
-    completion,
-    isLoading: isSuggestLoading,
-    error,
-  } = useCompletion({
-    api: "/api/suggest-messages",
-    initialCompletion: initialMessageString,
-  });
+  const [error, setError] = useState<string | null>(null);
+  const [completion, setCompletion] = useState(initialMessageString);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isSuggestLoading, setIsSuggestLoading] = useState(false);
+  const [complete, setComplete] = useState(false);
+  
+  // const {
+  //   complete,
+  //   isLoading: isSuggestLoading,
+  // } = useCompletion({
+  //   api: "/api/suggest-messages",
+  //   initialCompletion: initialMessageString,
+  // });
 
   const form = useForm<z.infer<typeof messageschema>>({
     resolver: zodResolver(messageschema),
@@ -63,13 +73,10 @@ export default function SendMessage() {
   const onSubmit = async (data: z.infer<typeof messageschema>) => {
     setIsLoading(true);
     try {
-      console.log("data", data);
-      console.log("username", username);
       const response = await axios.post<ApiResponse>("/api/send-messages", {
         ...data,
         username,
       });
-      console.log("response", response);
 
       toast({
         title: response.data.message,
@@ -81,7 +88,7 @@ export default function SendMessage() {
       toast({
         title: "Error",
         description:
-          axiosError.response?.data.message ?? "Failed to sent message",
+          axiosError.response?.data.message ?? "Failed to send message",
         variant: "destructive",
       });
     } finally {
@@ -91,10 +98,13 @@ export default function SendMessage() {
 
   const fetchSuggestedMessages = async () => {
     try {
-      complete("");
-    } catch (error) {
+      const suggestedMessages = await fetchSuggestions(messageContent);
+      console.log("Suggested Messages:", suggestedMessages);
+      setCompletion(suggestedMessages.join(specialChar));
+    } catch (error:any) {
       console.error("Error fetching messages:", error);
       // Handle error appropriately
+      setError(error.message as string);
     }
   };
 
@@ -154,7 +164,7 @@ export default function SendMessage() {
           </CardHeader>
           <CardContent className="flex flex-col space-y-4">
             {error ? (
-              <p className="text-red-500">{error.message}</p>
+              <p className="text-red-500">{error}</p>
             ) : (
               parseStringMessages(completion).map((message, index) => (
                 <Button
