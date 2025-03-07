@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token._id = user._id?.toString();
         token.isVerified = user.isVerified;
-        token.isAcceptingMessages = user.isAcceptingMessages;
+        token.isAcceptingmessages = user.isAcceptingmessages; // Updated property name
         token.username = user.username;
       }
       return token;
@@ -57,7 +57,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user._id = token._id;
         session.user.isVerified = token.isVerified;
-        session.user.isAcceptingMessages = token.isAcceptingMessages;
+        session.user.isAcceptingmessages = token.isAcceptingmessages; // Updated property name
         session.user.username = token.username;
       }
       return session;
